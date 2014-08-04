@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Defaults to pip2 unless otherwise specified
+if [ "$1" = 3 ]; then
+    V=3
+fi
+
+function outdated() {
+    # List out outdated python packages delimited by newline
+    pip${V} list --outdated \
+        | sed \
+            -e 's/(.*//g' \
+            -e '/^Could/ d' \
+            -e '/^Some/ d'
+}
+
+main() {
+    echo "Unpacking outdated packages for Python ${V:-2}"
+    declare -a list=( $(outdated) )
+
+    # Loop through each package and install upgrade
+    for ((i=0; i<${#list[@]}; i++)); do
+        printf "Installing Package: %-20s" "${list[i]}"
+
+        # Checks for successful installation
+        pip${V} install -U "${list[i]}" &>/dev/null \
+            && printf "$(tput setaf 2)%s$(tput sgr0)\n" "Success" \
+            || printf "$(tput setaf 1)%s$(tput sgr0)\n" "Fail"
+    done
+}
+
+if [ "$0" = "${BASH_SOURCE}" ]; then
+    main
+fi
