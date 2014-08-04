@@ -22,10 +22,10 @@ RUN apt-get update \
      python3-matplotlib \
      python3-zmq \
      cython3 \
-     libopenblas-dev \
-     libatlas-base-dev \
+     libblas-dev \
      liblapack-dev \
      libxml2-dev \
+     libcurl4-openssl-dev \
      libxslt1-dev \
      python3-numpy \
      python3-scipy \
