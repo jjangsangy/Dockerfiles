@@ -11,7 +11,7 @@ ENV        HOME       /root
 ENV        IPYTHONDIR /root/ipython
 ENV        TERM       xterm-256color
 
-WORKDIR    /root/ipython
+WORKDIR /root/ipython
 
 # Install Ubuntu Packages
 RUN apt-get update \
@@ -38,14 +38,21 @@ RUN apt-get update \
  && apt-get autoremove \
  && apt-get clean
 
-# Install Requirements
-ADD pip_upgrade /root/ipython/pip_upgrade
+# Update Packages and Install Requirements
+ADD pip_upgrade /usr/local/bin/
+ADD requirements.txt /root/ipython/
 RUN pip3 install -U ipython[all] \
- && ./pip_upgrade 3
+ && pip_upgrade 3 \
+ && pip3 install -r requirements.txt
 
 # Configuration
-RUN ipython profile create nbserver
+RUN ipython profile create nbserver \
+ && mkdir -p /etc/service/ipython
+ADD service /etc/service
 ADD profile/ipython_notebook_config.py /root/ipython/profile_nbserver/
 
-VOLUME /root/ipython/notebook
+WORKDIR /root/notebook
+VOLUME /root/notebook
 EXPOSE 8080
+
+ENTRYPOINT ipython notebook --profile nbserver
