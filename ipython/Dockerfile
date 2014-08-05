@@ -24,13 +24,14 @@ RUN apt-get update \
      cython3 \
      libblas-dev \
      liblapack-dev \
+     libatlas-dev \
+     libzmq-dev \
      libxml2-dev \
      libcurl4-openssl-dev \
      libxslt1-dev \
      python3-numpy \
      python3-scipy \
      ipython3 \
-     ipython3-notebook \
      python3-pandas \
      python3-nose \
      pandoc \
@@ -39,10 +40,8 @@ RUN apt-get update \
 
 # Install Requirements
 ADD pip_upgrade /root/ipython/pip_upgrade
-RUN pip3 install -U cython \
- && pip3 install -U pyzmq \
- && pip3 install -U ipython[all]
-RUN ./pip_upgrade 3
+RUN pip3 install -U ipython[all] \
+ && ./pip_upgrade 3
 
 # Configuration
 RUN ipython profile create nbserver
