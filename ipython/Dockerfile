@@ -7,9 +7,9 @@ FROM       jjangsangy/python3:3.4.0
 MAINTAINER Sang Han <jjangsangy@gmail.com>
 
 # Enviornment
-ENV        HOME       /root
-ENV        IPYTHONDIR /root/ipython
-ENV        TERM       xterm-256color
+ENV    HOME       /root
+ENV    IPYTHONDIR /root/ipython
+ENV    TERM       xterm-256color
 
 WORKDIR /root/ipython
 
@@ -41,18 +41,23 @@ RUN apt-get update \
 # Update Packages and Install Requirements
 ADD pip_upgrade /usr/local/bin/
 ADD requirements.txt /root/ipython/
-RUN pip3 install -U ipython[all] \
- && pip_upgrade 3 \
- && pip3 install -r requirements.txt
+RUN pip3 wheel --wheel-dir=/tmp/wheel ipython[all] \
+ && pip3 install --use-wheel --no-index --find-links=/tmp/wheel ipython
+RUN pip3 install -U ipython[all]
 
 # Configuration
-RUN ipython profile create nbserver \
+RUN ipython3 profile create nbserver \
  && mkdir -p /etc/service/ipython
 ADD service /etc/service
-ADD profile/ipython_notebook_config.py /root/ipython/profile_nbserver/
+ADD profile_nbserver /root/ipython/profile_nbserver
+
+RUN pip3 install -r requirements.txt
 
 WORKDIR /root/notebook
 VOLUME /root/notebook
-EXPOSE 8080
+EXPOSE 8888
 
-ENTRYPOINT ipython notebook --profile nbserver
+ADD notebook /root/notebook
+
+# ENTRYPOINT runsvdir-start
+# CMD ["/sbin/my_init"]

@@ -1,1 +1,16 @@
 requests
+argparse
+networkx
+bokeh
+greenlet
+mock
+numexpr
+openpyxl
+patsy
+ply
+pyflakes
+sqlalchemy
+ujson
+werkzeug
+xlrd
+xlsxwriter

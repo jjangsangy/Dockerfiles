@@ -1,4 +1,5 @@
 #!/bin/sh
 exec 2>&1
 cd /root/notebook
-exec /usr/local/bin/ipython notebook --profile nbserver --ip='*'
+exec /usr/local/bin/ipython notebook --profile=nbserver --ip='*'
+
