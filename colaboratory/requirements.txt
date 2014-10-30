@@ -1,0 +1,16 @@
+pyzmq
+pyreadline
+pyparsing
+nose
+jinja2
+pexpect
+tornado
+Sphinx
+docutils
+python-dateutil
+pytz
+wsgiref
+six
+numpy
+scipy
+pandas

@@ -51,6 +51,27 @@ RUN ipython3 profile create nbserver \
 ADD service /etc/service
 ADD profile_nbserver /root/ipython/profile_nbserver
 
+# Additional Packages
+# LLVM 3.3
+RUN apt-get install -y python-dev
+RUN wget -q -O - http://llvm.org/releases/3.3/llvm-3.3.src.tar.gz \
+  | tar xz -C /tmp \
+      && cd /tmp/llvm* \
+      && ./configure --enable-optimized --prefix=/usr/local \
+      && REQUIRES_RTTI=1 make install
+
+# llvmpy
+RUN git clone https://github.com/llvmpy/llvmpy \
+ && cd llvmpy \
+ && LLVM_CONFIG_PATH=/usr/local/bin/llvm-config python3 setup.py install
+
+# numba
+RUN git clone https://github.com/numba/numba.git \
+ && cd numba \
+ && pip3 install -r requirements.txt \
+ && python3 setup.py build_ext --inplace \
+ && python3 setup.py install
+
 RUN pip3 install -r requirements.txt
 
 WORKDIR /root/notebook
