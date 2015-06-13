@@ -6,33 +6,47 @@
 # Comes with GNU GCC Compiler and build system used to
 # compile Python binaries from source
 #
-# VERSION 0.0.2
+FROM debian:wheezy
 
-FROM       phusion/baseimage
 MAINTAINER Sang Han <jjangsangy@gmail.com>
 
-# Packages
-RUN apt-get update \
- && apt-get upgrade -y \
- && apt-get install -y \
-     build-essential \
-     pkg-config \
-     wget \
-     git \
-     libsqlite3-dev \
-     sqlite3 \
-     libssl-dev \
-     openssl \
-     python3-dev \
- && apt-get autoremove \
- && apt-get clean
+# Environment Variables
+ENV LANG          C.UTF-8
+ENV PYTHONINTERP  3
+ENV CONDA_VERSION 2.2.0
+ENV TERM          xterm-256color
+ENV INSTALLER     Anaconda${PYTHONINTERP}-${CONDA_VERSION}-Linux-x86_64.sh
+ENV LINK          http://repo.continuum.io/archive/${INSTALLER}
 
-RUN wget https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py \
- && python3 get-pip.py \
- && rm -rf get-pip.py
+# Create User
+RUN useradd --create-home --home-dir /home/condauser --shell /bin/bash condauser
+WORKDIR /home/condauser
 
-# Python Package Manager
-RUN pip3 install -U setuptools \
- && pip3 install -U distribute \
- && pip3 install -U pip \
- && pip3 install -U wheel
+# System Packages
+RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get update && apt-get install -y \
+        bzip2 \
+        ca-certificates \
+        curl \
+    && apt-get autoremove \
+    && apt-get clean
+
+# Install Anaconda
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh
+COPY ./src/* ./src/
+COPY ./bin/get_anaconda.sh get_anaconda.sh
+
+RUN ./get_anaconda.sh
+
+ENV PATH "/opt/conda/bin:$PATH"
+
+RUN conda update -p /opt/conda -y conda \
+    && conda clean -y --lock --tarballs --index-cache --packages --source-cache
+
+# Setup Environment
+EXPOSE 8888
+USER condauser
+ENV HOME=/home/condauser
+ENV SHELL=/bin/bash
+ENV USER=condauser
+
