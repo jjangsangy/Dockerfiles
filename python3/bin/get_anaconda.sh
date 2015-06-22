@@ -1,26 +1,16 @@
-install_anaconda() {
-
-    local pkg=${1} dest=${2}
-    bash "${pkg}" -b -p "${dest}"
-}
+#!/bin/bash
+# If you place an anaconda installer in the src directory
+# Docker will default to using your versionn of Anaconda
+#
+# This can be utilizes to cache installations so that
+# and not require going over the wire evry time
 
 check_installer() {
 
-    if [ -r "./src/${INSTALLER}" ]; then
-        printf "Found Installer: %s\n" "./src/${INSTALLER}"
-        mv ./src/${INSTALLER} .
-    else
+    if ! [ -r "${INSTALLER}" ]; then
         printf "Downloading Installer: %s\n" "${LINK}"
         curl -O "${LINK}"
     fi
-
 }
 
-main() {
-    check_installer
-    install_anaconda "${INSTALLER}" "/opt/conda"
-    rm "${INSTALLER}"
-}
-
-
-main
+check_installer && bash "${INSTALLER}" -b -p "/opt/conda" && rm "${INSTALLER}"
